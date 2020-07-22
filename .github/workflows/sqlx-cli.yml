@@ -1,0 +1,43 @@
+name: SQLX CLI
+
+on: push
+
+jobs:
+  cli:
+    name: CLI Binaries
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-musl
+            args: --features openssl-vendored
+            bin: target/release/cargo-sqlx
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin: target/release/cargo-sqlx.exe
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+            bin: target/release/cargo-sqlx
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          target: ${{ matrix.target }}
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: build
+          args: -p sqlx-cli --bin cargo-sqlx ${{ matrix.args }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: cargo-sqlx-${{ matrix.target }}
+          path: ${{ matrix.bin }}

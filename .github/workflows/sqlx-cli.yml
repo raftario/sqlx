@@ -35,7 +35,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
-          args: -p sqlx-cli --bin cargo-sqlx ${{ matrix.args }}
+          args: --manifest-path sqlx-cli/Cargo.toml --bin cargo-sqlx ${{ matrix.args }}
 
       - uses: actions/upload-artifact@v2
         with:
